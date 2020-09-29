@@ -28,6 +28,11 @@ token = my_function(token)
 # remove commas and dots
 token = [i.strip('.,') for i in token]
 
+for i in range(len(token)):
+    if "'" in token[i]:
+        p = token[i].find("'")
+        token[i] = token[i][:p] + token[i][p+1]
+
 # Lowercasing everything
 token = [i.lower() for i in token]
 
@@ -48,4 +53,5 @@ for i in range(len(stopwordlist)):
         except:
             continue
 
-print(pstoken)
+with open("result.txt", "w") as output:
+    output.write(str(pstoken))
