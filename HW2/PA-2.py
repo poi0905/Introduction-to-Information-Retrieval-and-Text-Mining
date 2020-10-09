@@ -15,17 +15,41 @@ for i in range(1095):
 
 # remove punctuation marks
 for i in range(len(token)):
-    token[i] = [j.strip(".,?:'!`_") for j in token[i]]
+    token[i] = [j.strip(".%@,?:'!+=`-_") for j in token[i]]
+    token[i] = [j.strip('"') for j in token[i]]
 
-# remove "\n" & "'" from abbreviation
+# remove "\n" and "'" from abbreviation
 for i in range(len(token)):
     for j in range(len(token[i])):
         if "\n" in token[i][j]:
             token[i][j] = token[i][j][1:]
-        if "'" in token[i][j]:
+        if "'" in token[i][j] and token[i][j][-1] == "s":
             p = token[i][j].find("'")
-            token[i][j] = token[i][j][:p] + token[i][j][p+1]
+            token[i][j] = token[i][j][:p]
+        if "'" in token[i][j] and token[i][j][-1] == "m":
+            p = token[i][j].find("'")
+            token[i][j] = token[i][j][:p]
+        if "'" in token[i][j] and token[i][j][-2] == "r" and token[i][j][-1] == "e":
+            p = token[i][j].find("'")
+            token[i][j] = token[i][j][:p]
+        if "'" in token[i][j] and token[i][j][-1] == "t":
+            p = token[i][j].find("'")
+            token[i][j] = token[i][j][:p]
 
 # Lowercasing everything
 for i in range(len(token)):
     token[i] = [j.lower() for j in token[i]]
+
+# Stemming using Porter’s algorithm.
+ps = PorterStemmer()
+for i in range(len(token)):
+    for j in range(len(token[i])):
+        token[i][j] = ps.stem(token[i][j])
+
+# Create a stop words list and eliminate them
+stopwordlist = ["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just", "don", "doesn", "should", "now"]
+for i in range(len(token)):
+    for j in token[i]:
+        for k in range(len(stopwordlist)):
+            if j == stopwordlist[k]:
+                token[i].remove(j)
