@@ -75,7 +75,8 @@ for i in range(len(totaltoken)):
 
 df_dict_items = df_dict.items()
 sorted_items = sorted(df_dict_items)
+df_dict = dict(sorted_items)
 
-with open("result1.txt", "w") as output:
-    output.write(str(sorted_items))
+with open("result.txt", "w") as output:
+    output.write(str(df_dict))
 
