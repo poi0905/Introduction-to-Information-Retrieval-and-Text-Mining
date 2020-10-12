@@ -81,11 +81,12 @@ for i in range(len(totaltoken)):
     for key in token[i]:
         df_dict[key] = df_dict.get(key, 0) + 1
 
-# Output a "dict.txt" file (sorted)
-term_index = 1
-with open("dict.txt", "w") as output:
+# Output a "dictionary.txt" file (sorted)
+t_index = 1
+with open("dictionary.txt", "w") as output:
+    output.write("t_index"+"\t"+"term"+"\t"+"df"+"\n")
     for key in sorted(df_dict):
-        string= str(term_index)+"\t"+str(key)+"\t"+str(df_dict[key])
+        string= str(t_index)+"\t"+str(key)+"\t"+str(df_dict[key])
         output.write(string)
         output.write("\n")
-        term_index += 1
+        t_index += 1
