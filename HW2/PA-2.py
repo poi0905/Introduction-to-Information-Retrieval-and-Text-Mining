@@ -42,6 +42,9 @@ for i in range(len(token)):
         if "'" in token[i][j] and token[i][j][-2] == "r" and token[i][j][-1] == "e":
             p = token[i][j].find("'")
             token[i][j] = token[i][j][:p]
+        if "'" in token[i][j] and token[i][j][-2] == "l" and token[i][j][-1] == "l":
+            p = token[i][j].find("'")
+            token[i][j] = token[i][j][:p]
         if "'" in token[i][j] and token[i][j][-1] == "t":
             p = token[i][j].find("'")
             token[i][j] = token[i][j][:p]
