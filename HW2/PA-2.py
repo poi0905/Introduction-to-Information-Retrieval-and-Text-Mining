@@ -25,8 +25,8 @@ for i in range(len(token)):
 
 # remove punctuation marks & ""(produce after strip)
 for i in range(len(token)):
+    token[i] = [j.strip('><1234567890!@#$%^&*()-_=+[]\|/.,?:;"{}`~') for j in token[i]]
     token[i] = [j.strip("><1234567890!@#$%^&*()-_=+[]\|/.,?:;'{}`~") for j in token[i]]
-    token[i] = [j.strip('"') for j in token[i]]
     while "" in token[i]:
         token[i].remove("")
 
