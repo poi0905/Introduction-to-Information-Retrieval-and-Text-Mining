@@ -1,8 +1,10 @@
 from nltk.stem import PorterStemmer
+import numpy as np
+import math
 
 # load the txt
 txt = []
-for i in range(1,1096):
+for i in range(1, 1096):
     f = open("C:\\Users\\asdfg\\OneDrive\\桌面\\IRTM\\IRTM\\"+str(i)+".txt", "r")
     words = f.read()
     txt.append(words)
@@ -67,8 +69,10 @@ for i in range(len(token)):
 
 # Remove duplicates to get df
 df_token = token
+
+
 def remove_duplicates(x):
-    return sorted(set(x), key = x.index)
+    return sorted(set(x), key=x.index)
 
 for i in range(len(df_token)):
     df_token[i] = remove_duplicates(df_token[i])
@@ -83,13 +87,71 @@ df_dict = {}
 for i in range(len(totaltoken)):
     for key in token[i]:
         df_dict[key] = df_dict.get(key, 0) + 1
-
-# Output a "dictionary.txt" file (sorted)
+'''
+# Output a "dictionary.txt" file(sorted)
 t_index = 1
 with open("dictionary.txt", "w") as output:
     output.write("t_index"+"\t"+"term"+"\t"+"df"+"\n")
     for key in sorted(df_dict):
         string= str(t_index)+"\t"+str(key)+"\t"+str(df_dict[key])
-        output.write(string)
-        output.write("\n")
+        output.write(string+"\n")
         t_index += 1
+
+# calculate each term's idf
+for key in df_dict.keys():
+    df_dict[key] = math.log10(1095/df_dict[key])
+
+# transfer each document into a tf-idf unit vector
+for i in range(1095):
+    t_index = 0
+    t_index_list = []
+    tf_idf_list = []
+    n = 0   # store the number of terms(required)
+    length = 0    # for normalizing
+
+    for key in sorted(df_dict.keys()):
+        t_index += 1
+        if key in token[i]:
+            t_index_list.append(t_index)
+            n += 1
+            tf = token[i].count(key)
+            tf_idf = tf * df_dict[key]
+            tf_idf_list.append(tf_idf)
+            length += (tf_idf)**2
+
+    tf_idf_list = [x / math.sqrt(length) for x in tf_idf_list]
+
+    with open(str(i+1)+".txt", "w") as output:
+        output.write(str(n)+"\n")
+        output.write("t_index"+"\t"+"tf-idf"+"\n")
+        for i in range(len(tf_idf_list)):
+            output.write(str(t_index_list[i])+"\t"+str(tf_idf_list[i])+"\n")
+
+# cosine similarity
+def cosine(dx, dy):
+    f1 = open(dx, "r")
+    f2 = open(dy, "r")
+
+    # there are 13,614 terms in the dict
+    vec_x = np.zeros(13614)
+    vec_y = np.zeros(13614)
+
+    # first and second rows are useless
+    for x in f1.readlines()[2:]:
+        tmp = x.strip().split("\t")
+        vec_x[int(tmp[0])-1]=float(tmp[1])
+
+    for x in f2.readlines()[2:]:
+        tmp = x.strip().split("\t")
+        vec_y[int(tmp[0])-1]=float(tmp[1])
+
+    inner_product=np.inner(vec_x, vec_y)
+
+    return(inner_product)
+
+
+document1 = "C:\\Users\\asdfg\\OneDrive\\桌面\\1.txt"
+document2 = "C:\\Users\\asdfg\\OneDrive\\桌面\\2.txt"
+value = cosine(document1,document2)
+print("The cosine similarity of document1 and document2 is: " + str(value))
+'''
