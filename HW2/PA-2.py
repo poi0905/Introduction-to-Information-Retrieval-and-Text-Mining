@@ -2,76 +2,92 @@ from nltk.stem import PorterStemmer
 import numpy as np
 import math
 
-# load the txt
+# Load the txt
 txt = []
 for i in range(1, 1096):
     f = open("C:\\Users\\asdfg\\OneDrive\\桌面\\IRTM\\IRTM\\"+str(i)+".txt", "r")
     words = f.read()
     txt.append(words)
 
-# split the text roughly
-token = []
-for i in range(1095):
-    a = txt[i].split(' ')
-    token.append(a)
 
-# Lowercasing everything
-for i in range(len(token)):
-    token[i] = [j.lower() for j in token[i]]
+# Tokenize
+def tokenize(txt):
+    token = []
+    for i in range(1095):
+        a = txt[i].split(' ')
+        token.append(a)
 
-# remove "\n"
-for i in range(len(token)):
-    for j in range(len(token[i])):
-        if "\n" in token[i][j]:
-            token[i][j] = token[i][j][1:]
+    # Lowercasing everything
+    for i in range(len(token)):
+        token[i] = [j.lower() for j in token[i]]
 
-# remove punctuation marks & ""(produce after strip)
-for i in range(len(token)):
-    token[i] = [j.strip('><1234567890!@#$%^&*()-_=+[]\|/.,?:;"{}`~') for j in token[i]]
-    token[i] = [j.strip("><1234567890!@#$%^&*()-_=+[]\|/.,?:;'{}`~") for j in token[i]]
-    while "" in token[i]:
-        token[i].remove("")
+    # Remove "\n"
+    for i in range(len(token)):
+        for j in range(len(token[i])):
+            if "\n" in token[i][j]:
+                token[i][j] = token[i][j][1:]
 
-# "'" from abbreviation
-for i in range(len(token)):
-    for j in range(len(token[i])):
-        if "'" in token[i][j] and token[i][j][-1] == "s":   # eg: he's
-            p = token[i][j].find("'")
-            token[i][j] = token[i][j][:p]
-        if "'" in token[i][j] and token[i][j][-1] == "m":   # eg: i'm
-            p = token[i][j].find("'")
-            token[i][j] = token[i][j][:p]
-        if "'" in token[i][j] and token[i][j][-2] == "r" and token[i][j][-1] == "e":    # eg: they're
-            p = token[i][j].find("'")
-            token[i][j] = token[i][j][:p]
-        if "'" in token[i][j] and token[i][j][-2] == "l" and token[i][j][-1] == "l":    # eg: i'll
-            p = token[i][j].find("'")
-            token[i][j] = token[i][j][:p]
-        if "'" in token[i][j] and token[i][j][-2] == "v" and token[i][j][-1] == "e":    # eg: could've
-            p = token[i][j].find("'")
-            token[i][j] = token[i][j][:p]
-        if "'" in token[i][j] and token[i][j][-1] == "d":   # eg: she'd
-            p = token[i][j].find("'")
-            token[i][j] = token[i][j][:p]
-        if "'" in token[i][j] and token[i][j][-1] == "t":   # eg: don't
-            p = token[i][j].find("'")
-            token[i][j] = token[i][j][:p]
+    # Remove punctuation marks & ""(produce after strip)
+    for i in range(len(token)):
+        token[i] = [j.strip('><1234567890!@#$%^&*()-_=+[]\|/.,?:;"{}`~') for j in token[i]]
+        token[i] = [j.strip("><1234567890!@#$%^&*()-_=+[]\|/.,?:;'{}`~") for j in token[i]]
+        while "" in token[i]:
+            token[i].remove("")
 
-# Create a stop words list and eliminate them
-stopwordlist = ["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just", "don", "doesn", "should", "now"]
-for i in range(len(token)):
-    token[i] = [a for a in token[i] if a not in stopwordlist]
+    # Remove "'" from abbreviation and website
+    for i in range(len(token)):
+        for j in range(len(token[i])):
+            if "'" in token[i][j] and token[i][j][-1] == "s":   # eg: he's
+                p = token[i][j].find("'")
+                token[i][j] = token[i][j][:p]
+            if "'" in token[i][j] and token[i][j][-1] == "m":   # eg: i'm
+                p = token[i][j].find("'")
+                token[i][j] = token[i][j][:p]
+            if "'" in token[i][j] and token[i][j][-2] == "r" and token[i][j][-1] == "e":    # eg: they're
+                p = token[i][j].find("'")
+                token[i][j] = token[i][j][:p]
+            if "'" in token[i][j] and token[i][j][-2] == "l" and token[i][j][-1] == "l":    # eg: i'll
+                p = token[i][j].find("'")
+                token[i][j] = token[i][j][:p]
+            if "'" in token[i][j] and token[i][j][-2] == "v" and token[i][j][-1] == "e":    # eg: could've
+                p = token[i][j].find("'")
+                token[i][j] = token[i][j][:p]
+            if "'" in token[i][j] and token[i][j][-1] == "d":   # eg: she'd
+                p = token[i][j].find("'")
+                token[i][j] = token[i][j][:p]
+            if "'" in token[i][j] and token[i][j][-1] == "t":   # eg: don't
+                p = token[i][j].find("'")
+                token[i][j] = token[i][j][:p]
+            try:
+                if token[i][j][0] == "h" and token[i][j][1] == "t" and token[i][j][2] == "t" and token[i][j][3] == "p":   # http...
+                    token[i][j] = "i"   # will be eliminate by stopword list
+                if token[i][j][0] == "w" and token[i][j][1] == "w" and token[i][j][2] == "w":   # www...
+                    token[i][j] = "i"   # will be eliminate by stopword list
+                if token[i][j][-4] == "." and token[i][j][-3] == "c" and token[i][j][-2] == "o" and token[i][j][-1] == "m":  # .com
+                    p = token[i][j].find(".")
+                    token[i][j] = token[i][j][:p]
+            except:
+                continue
 
-# Stemming using Porter’s algorithm.
-ps = PorterStemmer()
-for i in range(len(token)):
-    for j in range(len(token[i])):
-        token[i][j] = ps.stem(token[i][j])
+    # Create a stop words list and eliminate them
+    stopwordlist = ["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just", "don", "doesn", "should", "now"]
+    for i in range(len(token)):
+        token[i] = [a for a in token[i] if a not in stopwordlist]
 
-# Create an alphabet list in case the single alphabet exists
-stopwordlist = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
-for i in range(len(token)):
-    token[i] = [a for a in token[i] if a not in stopwordlist]
+    # Stemming using Porter’s algorithm.
+    ps = PorterStemmer()
+    for i in range(len(token)):
+        for j in range(len(token[i])):
+            token[i][j] = ps.stem(token[i][j])
+
+    # Create an alphabet list in case the single alphabet exists
+    stopwordlist = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
+    for i in range(len(token)):
+        token[i] = [a for a in token[i] if a not in stopwordlist]
+
+    return token
+
+token = tokenize(txt)
 
 
 # Remove duplicates to get df
@@ -134,14 +150,15 @@ for i in range(1095):
             output.write(str(t_index_list[i])+"\t"+str(tfidf_list[i])+"\n")
 '''
 
+
 # Cosine similarity
 def cosine(dx, dy):
     f1 = open(dx, "r")
     f2 = open(dy, "r")
 
-    # there are 13,543 terms in the dict
-    vec_x = np.zeros(13543)
-    vec_y = np.zeros(13543)
+    # there are 13,460 terms in the dict
+    vec_x = np.zeros(13460)
+    vec_y = np.zeros(13460)
 
     # first and second rows are useless.
     # temp[0] is index, temp[1] is tf-idf
