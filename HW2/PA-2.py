@@ -1,6 +1,7 @@
 from nltk.stem import PorterStemmer
 import numpy as np
 import math
+import re
 
 # Load the txt
 txt = []
@@ -14,50 +15,25 @@ for i in range(1, 1096):
 def tokenize(txt):
     token = []
     for i in range(1095):
-        a = txt[i].split(' ')
+        a = re.split("/|,|'|`|-| |\n", txt[i])
         token.append(a)
 
     # Lowercasing everything
     for i in range(len(token)):
         token[i] = [j.lower() for j in token[i]]
 
-    # Remove "\n"
+    # Remove punctuation marks & "." & ""(produce after strip)
     for i in range(len(token)):
+        token[i] = [j.strip('><1234567890!@#$%^&*()_=+[]\|?:;"{}~') for j in token[i]]
         for j in range(len(token[i])):
-            if "\n" in token[i][j]:
-                token[i][j] = token[i][j][1:]
-
-    # Remove punctuation marks & ""(produce after strip)
-    for i in range(len(token)):
-        token[i] = [j.strip('><1234567890!@#$%^&*()-_=+[]\|/.,?:;"{}`~') for j in token[i]]
-        token[i] = [j.strip("><1234567890!@#$%^&*()-_=+[]\|/.,?:;'{}`~") for j in token[i]]
+            if "." in token[i][j]:
+                token[i][j] = ""
         while "" in token[i]:
             token[i].remove("")
 
-    # Remove "'" from abbreviation and website
+    # Remove website
     for i in range(len(token)):
         for j in range(len(token[i])):
-            if "'" in token[i][j] and token[i][j][-1] == "s":   # eg: he's
-                p = token[i][j].find("'")
-                token[i][j] = token[i][j][:p]
-            if "'" in token[i][j] and token[i][j][-1] == "m":   # eg: i'm
-                p = token[i][j].find("'")
-                token[i][j] = token[i][j][:p]
-            if "'" in token[i][j] and token[i][j][-2] == "r" and token[i][j][-1] == "e":    # eg: they're
-                p = token[i][j].find("'")
-                token[i][j] = token[i][j][:p]
-            if "'" in token[i][j] and token[i][j][-2] == "l" and token[i][j][-1] == "l":    # eg: i'll
-                p = token[i][j].find("'")
-                token[i][j] = token[i][j][:p]
-            if "'" in token[i][j] and token[i][j][-2] == "v" and token[i][j][-1] == "e":    # eg: could've
-                p = token[i][j].find("'")
-                token[i][j] = token[i][j][:p]
-            if "'" in token[i][j] and token[i][j][-1] == "d":   # eg: she'd
-                p = token[i][j].find("'")
-                token[i][j] = token[i][j][:p]
-            if "'" in token[i][j] and token[i][j][-1] == "t":   # eg: don't
-                p = token[i][j].find("'")
-                token[i][j] = token[i][j][:p]
             try:
                 if token[i][j][0] == "h" and token[i][j][1] == "t" and token[i][j][2] == "t" and token[i][j][3] == "p":   # http...
                     token[i][j] = "i"   # will be eliminate by stopword list
@@ -69,10 +45,12 @@ def tokenize(txt):
             except:
                 continue
 
-    # Create a stop words list and eliminate them
-    stopwordlist = ["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just", "don", "doesn", "should", "now"]
+    # Create a stop words list & abbreviation list(eg. i'll) in order to eliminate them
+    stopwordlist = ["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just", "don", "doesn", "should", "now", "about"]
+    abbrlist = ["re", "ll", "ve"]
     for i in range(len(token)):
         token[i] = [a for a in token[i] if a not in stopwordlist]
+        token[i] = [a for a in token[i] if a not in abbrlist]
 
     # Stemming using Porter’s algorithm.
     ps = PorterStemmer()
@@ -149,6 +127,8 @@ for i in range(1095):
         for i in range(len(tfidf_list)):
             output.write(str(t_index_list[i])+"\t"+str(tfidf_list[i])+"\n")
 '''
+document1 = "C:\\Users\\asdfg\\OneDrive - g.ntu.edu.tw\\NTU\\109-1\\109-1IRTM\\Introduction-to-Information-Retrieval-and-Text-Mining\\HW2\\1.txt"
+document2 = "C:\\Users\\asdfg\\OneDrive - g.ntu.edu.tw\\NTU\\109-1\\109-1IRTM\\Introduction-to-Information-Retrieval-and-Text-Mining\\HW2\\2.txt"
 
 
 # Cosine similarity
@@ -156,16 +136,15 @@ def cosine(dx, dy):
     f1 = open(dx, "r")
     f2 = open(dy, "r")
 
-    # there are 13,460 terms in the dict
-    vec_x = np.zeros(13460)
-    vec_y = np.zeros(13460)
+    # there are 11,841 terms in the dict
+    vec_x = np.zeros(11841)
+    vec_y = np.zeros(11841)
 
     # first and second rows are useless.
     # temp[0] is index, temp[1] is tf-idf
     for x in f1.readlines()[2:]:
         temp = x.strip().split("\t")
         vec_x[int(temp[0])-1] = float(temp[1])
-
     for x in f2.readlines()[2:]:
         temp = x.strip().split("\t")
         vec_y[int(temp[0])-1] = float(temp[1])
@@ -174,7 +153,5 @@ def cosine(dx, dy):
 
     return(sim)
 
-document1 = "C:\\Users\\asdfg\\OneDrive - g.ntu.edu.tw\\NTU\\109-1\\109-1IRTM\\Introduction-to-Information-Retrieval-and-Text-Mining\\HW2\\1.txt"
-document2 = "C:\\Users\\asdfg\\OneDrive - g.ntu.edu.tw\\NTU\\109-1\\109-1IRTM\\Introduction-to-Information-Retrieval-and-Text-Mining\\HW2\\2.txt"
 sim = cosine(document1, document2)
 print("The cosine similarity of document1 and document2 is: " + str(sim))
