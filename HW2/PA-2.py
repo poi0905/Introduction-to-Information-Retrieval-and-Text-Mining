@@ -107,7 +107,6 @@ for i in range(1095):
     t_index_list = []
     tfidf_list = []
     n = 0   # store the number of terms(required)
-    length = 0    # for normalizing
 
     for key in sorted(df_dict.keys()):
         t_index += 1
@@ -117,9 +116,11 @@ for i in range(1095):
             tf = token[i].count(key)
             tfidf = tf * df_dict[key]
             tfidf_list.append(tfidf)
-            length += (tfidf)**2
 
-    tfidf_list = [x / math.sqrt(length) for x in tfidf_list]
+    tfidf_list = np.array(tfidf_list)
+    norm = np.linalg.norm(tfidf_list)
+    tfidf_list = tfidf_list / norm
+
 '''
     with open(str(i+1)+".txt", "w") as output:
         output.write(str(n)+"\n")
@@ -149,7 +150,7 @@ def cosine(dx, dy):
         temp = x.strip().split("\t")
         vec_y[int(temp[0])-1] = float(temp[1])
 
-    sim = np.inner(vec_x, vec_y)
+    sim = np.dot(vec_x, vec_y)
 
     return(sim)
 
