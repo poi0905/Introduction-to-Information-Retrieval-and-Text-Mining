@@ -66,13 +66,12 @@ def tokenize(txt):
     return token
 
 token = tokenize(txt)
-
+df_token = tokenize(txt)
 
 # Remove duplicates to get df
 def remove_duplicates(x):
     return sorted(set(x), key=x.index)
 
-df_token = token
 
 for i in range(len(df_token)):
     df_token[i] = remove_duplicates(df_token[i])
@@ -85,7 +84,7 @@ for i in range(len(df_token)):
 # Build a dict
 df_dict = {}
 for i in range(len(totaltoken)):
-    for key in token[i]:
+    for key in df_token[i]:
         df_dict[key] = df_dict.get(key, 0) + 1
 '''
 # Output a "dictionary.txt" file(sorted)
@@ -120,7 +119,6 @@ for i in range(1095):
     tfidf_list = np.array(tfidf_list)
     norm = np.linalg.norm(tfidf_list)
     tfidf_list = tfidf_list / norm
-
 '''
     with open(str(i+1)+".txt", "w") as output:
         output.write(str(n)+"\n")
@@ -152,7 +150,7 @@ def cosine(dx, dy):
 
     sim = np.dot(vec_x, vec_y)
 
-    return(sim)
+    return sim
 
 sim = cosine(document1, document2)
 print("The cosine similarity of document1 and document2 is: " + str(sim))
