@@ -124,7 +124,7 @@ for i in range(1095):
     tfidf_list = np.array(tfidf_list)
     norm = np.linalg.norm(tfidf_list)
     tfidf_list = tfidf_list / norm
-'''
+
     with open(str(i+1)+".txt", "w") as output:
         output.write(str(n)+"\n")
         output.write("t_index"+"\t"+"tf-idf"+"\n")
@@ -136,3 +136,4 @@ document2 = "C:\\Users\\asdfg\\OneDrive - g.ntu.edu.tw\\NTU\\109-1\\109-1IRTM\\I
 
 sim = cosine(document1, document2)
 print("The cosine similarity of document1 and document2 is: " + str(sim))
+'''
